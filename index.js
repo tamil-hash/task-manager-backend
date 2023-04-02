@@ -2,11 +2,15 @@ import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 
+//database config
+import dbConfig from "./src/config/database.js";
+
 //routes
 import authRoutes from "./src/routes/authRoutes.js";
 
 const app = express();
 
+dbConfig();
 dotenv.config({ path: ".env" });
 
 //middlewares
