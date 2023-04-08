@@ -8,7 +8,7 @@ import {catchAsync} from "../utils/utils.js";
 
 const router = express.Router();
 
-router.post("/register", catchAsync(registerUser));
+router.post("/signup", catchAsync(registerUser));
 router.post("/login", catchAsync(loginUser));
 
 export default router;
