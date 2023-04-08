@@ -46,6 +46,7 @@ export const loginUser = async (req, res, next) => {
         name: user.name,
         email: user.email,
         token,
+        id: user._id
       };
       res.status(200).json(newUser);
     } else {
