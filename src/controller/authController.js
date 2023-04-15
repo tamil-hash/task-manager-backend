@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken";
 import User from "../models/userModel.js";
 
 export const registerUser = async (req, res, next) => {
-  const { name, email,password } = req.body;
+  const { name, email, password } = req.body;
 
   if (!(email && password && name)) {
     res.status(400).send("All input is required");
@@ -34,23 +34,91 @@ export const loginUser = async (req, res, next) => {
   } else {
     let user = await User.findOne({ email: email.toLowerCase() });
 
-    if (user && bcrypt.compare(password, user.password)) {
+    if (user && (await bcrypt.compare(password, user.password))) {
       const token = jwt.sign(
         { user_id: user._id, email },
         process.env.JWT_SECRET_KEY,
         {
-          expiresIn: "2h",
+          expiresIn: "1d",
         }
       );
+
+      const refreshToken = jwt.sign(
+        { user_id: user._id, email },
+        process.env.REFRESH_TOKEN_SECRET,
+        { expiresIn: "1d" }
+      );
+
       const newUser = {
         name: user.name,
         email: user.email,
         token,
-        id: user._id
+        id: user._id,
       };
-      res.status(200).json(newUser);
+
+      res.cookie("jwt", refreshToken, {
+        httpOnly: true,
+        sameSite: "None",
+        secure: true,
+        maxAge: 24 * 60 * 60 * 1000,
+      });
+      return res.status(200).json(newUser);
     } else {
-      res.status(400).send("Invalid Credentials");
+      res.status(406).send("Invalid Credentials");
     }
+  }
+};
+
+export const refreshToken = async (req, res) => {
+  console.log(req.cookies.jwt)
+  if (req.cookies?.jwt) {
+    const refreshToken = req.cookies.jwt;
+
+    jwt.verify(
+      refreshToken,
+      process.env.REFRESH_TOKEN_SECRET,
+      async (err, decoded) => {
+        if (err) {
+          return res.status(406).json({ message: "Unauthorized" });
+        } else {
+          let user = await User.findOne({ email: email.toLowerCase() });
+
+          if (user && (await bcrypt.compare(password, user.password))) {
+            const token = jwt.sign(
+              { user_id: user._id, email },
+              process.env.JWT_SECRET_KEY,
+              {
+                expiresIn: "1d",
+              }
+            );
+
+            const refreshToken = jwt.sign(
+              { user_id: user._id, email },
+              process.env.REFRESH_TOKEN_SECRET,
+              { expiresIn: "1d" }
+            );
+
+            const newUser = {
+              name: user.name,
+              email: user.email,
+              token,
+              id: user._id,
+            };
+
+            res.cookie("jwt", refreshToken, {
+              httpOnly: true,
+              sameSite: "None",
+              secure: true,
+              maxAge: 24 * 60 * 60 * 1000,
+            });
+            return res.status(200).json(newUser);
+          } else {
+            res.status(406).send("Invalid Credentials");
+          }
+        }
+      }
+    );
+  } else {
+    return res.status(406).json({ message: "Unauthorized" });
   }
 };
