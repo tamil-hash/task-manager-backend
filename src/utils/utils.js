@@ -4,9 +4,6 @@ export const catchAsync = (fn) => {
       console.log(error);
       const errorMessage =
         error.message || "Something went wrong! Please try again";
-
-      console.log(error);
-
       res.status(500).json({ text: errorMessage });
     });
   };

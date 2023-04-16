@@ -75,7 +75,6 @@ export const refreshToken = async (req, res) => {
         if (err) {
           return res.status(406).json({ message: "Unauthorized" });
         } else {
-          console.log(decoded)
           let user = await User.findOne({ email: decoded.email.toLowerCase() });
 
             const token = jwt.sign(
