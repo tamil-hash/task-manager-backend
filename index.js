@@ -6,8 +6,12 @@ import cookieparser from "cookie-parser";
 //database config
 import dbConfig from "./src/config/database.js";
 
+//middlewares
+import verifyToken from "./src/middleware/verifyToken.js";
+
 //routes
 import authRoutes from "./src/routes/authRoutes.js";
+import taskRoutes from "./src/routes/taskRoutes.js";
 
 const app = express();
 
@@ -22,15 +26,15 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use("/", authRoutes);
 
-app.get("/check",(req,res)=>{
-   res.send("Hello World!");
-})
+app.use("/tasks", verifyToken, taskRoutes);
 
+app.get("/check", (req, res) => {
+  res.send("Hello World!");
+});
 
 app.all("*", (_, res) => {
   res.status(404).send("Unknown path! 404 not found!");
 });
-
 
 app.listen(process.env.PORT, () => {
   console.log(`App listening on port ${process.env.PORT}`);
