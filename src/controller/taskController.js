@@ -18,7 +18,6 @@ export const createTask = async (req, res) => {
 
 export const fetchTasks = async (req, res) => {
   const user = req.user;
-  console.log(user);
   if (!user.user_id) {
     res.status(406).send("UserId required");
   }
