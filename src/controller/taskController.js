@@ -30,8 +30,7 @@ export const deleteTask = async (req, res) => {
   if (id) {
     res.status(406).send("Id required");
   }
-  const deleted = await Task.deleteOne({ id });
-  console.log(deleted);
+  await Task.deleteOne({ id });
   res.status(200).send("Task Deleted Successfully.");
 };
 
