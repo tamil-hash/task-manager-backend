@@ -13,6 +13,7 @@ const taskSchema = new mongoose.Schema({
   time: { type: String },
   createdBy: { type: String },
   createdAt: { type: Date },
+  startTime: { type: Date },
 });
 
 const Task = mongoose.model("Tasks", taskSchema);
