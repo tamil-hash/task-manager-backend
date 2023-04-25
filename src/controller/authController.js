@@ -21,7 +21,28 @@ export const registerUser = async (req, res, next) => {
         password: encryptedPassword,
       });
 
-      res.status(201).json(user);
+      const token = jwt.sign(
+        { user_id: user._id, email },
+        process.env.JWT_SECRET_KEY,
+        {
+          expiresIn: "1d",
+        }
+      );
+
+      const refreshToken = jwt.sign(
+        { user_id: user._id, email },
+        process.env.REFRESH_TOKEN_SECRET,
+        { expiresIn: "1d" }
+      );
+
+      const newUser = {
+        name: user.name,
+        email: user.email,
+        token,
+        id: user._id,
+        refreshToken
+      };
+      res.status(201).json(newUser);
     }
   }
 };
