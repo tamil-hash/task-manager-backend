@@ -28,9 +28,6 @@ app.use("/", authRoutes);
 
 app.use("/tasks", verifyToken, taskRoutes);
 
-app.get("/check", (req, res) => {
-  res.send("Hello World!");
-});
 
 app.all("*", (_, res) => {
   res.status(404).send("Unknown path! 404 not found!");
